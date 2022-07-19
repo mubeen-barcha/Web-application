@@ -1,17 +1,37 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import { createRoot } from "react-dom/client";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+class App extends React.Component {
+  constructor(props) {
+    super(props);
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+    // this is only time we do direct assignment
+    this.state = { lat: null, errorMessage: "" };
+
+    window.navigator.geolocation.getCurrentPosition(
+      (position) => {
+        // we called setState!!!!
+        this.setState({ lat: position.coords.latitude });
+      },
+      (err) => {
+        this.setState({ errorMessage: err.message });
+      }
+    );
+  }
+
+  // React say we have to define render!!
+  render() {
+    if (this.state.errorMessage && !this.state.lat) {
+        return <div>Error: {this.state.errorMessage}</div>
+    }
+
+    if (!this.state.errorMessage && this.state.lat) {
+        return <div>latitude: {this.state.lat}</div>
+    }
+    return <div>Loading!</div>
+  }
+}
+
+const container = document.getElementById("root");
+const root = createRoot(container);
+root.render(<App />);
